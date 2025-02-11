@@ -46,30 +46,30 @@ np.set_printoptions(precision=4)
 #
 # print(householder(A))
 
-A = np.array(
-    [[1.0, 1.0, 1.0], [1.0, 2.0, 4.0], [1.0, 3.0, 9.0], [1.0, 4.0, 16.0]]
-)
+# A = np.array(
+#     [[1.0, 1.0, 1.0], [1.0, 2.0, 4.0], [1.0, 3.0, 9.0], [1.0, 4.0, 16.0]]
+# )
 
 # b = np.array([[1237., 1941., 2417., 711., 1177., 475.]])
 
-print(householder(A))
+# print(householder(A))
 
 
 #
 #
 # eigen normalized_power_iteration unit tests
-A = np.array([[3.0, 1.0], [1.0, 3.0]])
-
-x0 = np.array([0.0, 1.0])
+# A = np.array([[3.0, 1.0], [1.0, 3.0]])
+#
+# x0 = np.array([0.0, 1.0])
 # print('\npower iteration: ')
 # print(power_iteration(A, num_iterations=9, x0=x0, verbose=True))
 # print('\npower iteration arbitrary nonzero vector: ')
 # print(power_iteration(A, num_iterations=9, verbose=True))
 #
-print("\nnormalized power iteration: ")
-print(normalized_power_iteration(A, num_iterations=9, x0=x0, verbose=True))
-print("\nnormalized power iteration arbitrary nonzero vector: ")
-print(normalized_power_iteration(A, num_iterations=9, verbose=True))
+# print("\nnormalized power iteration: ")
+# print(normalized_power_iteration(A, num_iterations=9, x0=x0, verbose=True))
+# print("\nnormalized power iteration arbitrary nonzero vector: ")
+# print(normalized_power_iteration(A, num_iterations=9, verbose=True))
 #
 # print('\ninverse iteration: ')
 # print(inverse_iteration(A, num_iterations=9, x0=x0, verbose=True))
@@ -129,3 +129,26 @@ print(normalized_power_iteration(A, num_iterations=9, verbose=True))
 #               [1.1159, 0.1129, 0.6079, 1.7231]])
 #
 # print(qr_iteration_with_shifts(A, num_iterations=3, shift='rayleigh', verbose=True))
+
+# lu_factorization unit tests
+
+A = np.array([[1, 2, 2],
+              [4, 4, 2],
+              [4, 6, 4]], dtype=float)
+
+b = np.array([3, 6, 10], dtype=float)
+
+lu_factorization(A)
+print(A)
+
+# lu_factorization_with_partial_pivoting unit tests
+
+A = np.array([[1, 2, 2],
+              [4, 4, 2],
+              [4, 6, 4]], dtype=float)
+
+b = np.array([3, 6, 10], dtype=float)
+
+lu_factorization_with_partial_pivoting(A)
+print(A)
+

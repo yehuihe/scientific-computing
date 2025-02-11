@@ -14,3 +14,4 @@ books such as
 - Scientific Computing: An Introductory Survey by Michael T. Heath
 - Numerical Linear Algebra by Lloyd N. Trefethen and David Bau
 
+And it's reference papers, including original paper for algorithms.
