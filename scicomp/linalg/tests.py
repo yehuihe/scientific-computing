@@ -1,6 +1,6 @@
 import numpy as np
 from _linalg import *
-from qr_factorization import householder
+from _qr_factorization import householder
 from _eigen import (
     power_iteration,
     normalized_power_iteration,

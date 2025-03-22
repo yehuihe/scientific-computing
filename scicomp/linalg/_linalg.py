@@ -5,9 +5,12 @@ Notes
 This module is a lite version of the linalg.py module in SciPy which
 """
 
-__all__ = ["forward_substitution", "backward_substitution",
+__all__ = ["forward_substitution", "backward_substitution", "solve",
            "lu_factorization", "lu_factorization_with_partial_pivoting",
-           "cholesky_factorization"]
+           "cholesky_factorization",
+           "tridiagonal_lu_factorization_without_pivoting",
+           "blas_general_band_storage_mode",
+           "rank_one_updating"]
 
 import math
 
@@ -113,7 +116,7 @@ def backward_substitution(u, b):
 
     x = np.zeros(n)  # solution component
 
-    for j in range(n - 1, -1, -1):  # loop backwards over columns
+    for j in range(n-1, -1, -1):  # loop backwards over columns
         if u[j, j] == 0:  # stop if matrix is singular
             raise LinAlgError("Singular matrix")
         # x[j] = b[j] / u[j, j]
@@ -191,7 +194,7 @@ def solve(a, b, lu_factorized=False):
     array([-6.,  8.5, -4.5])
 
     """
-    # TODO: memory optimization. l and u matrix in place instead of memory allocation
+    # TODO: memory optimization. l and u matrix in place instead of memory allocation. Put A directly into substitution
     n = a.shape[0]
 
     if not lu_factorized:
@@ -465,3 +468,84 @@ def blas_general_band_storage_mode(a, l_and_u):
     return agb
 
 
+def rank_one_updating(a, b, u, v, y=None):
+    """
+    Rank-One Updating of Solution based on Sherman-Morrison formula.
+
+    The matrix a is assuming LU-factorized.
+
+    Parameters
+    ----------
+    a : (N, N) array_like
+        a is a known n * n matrix
+    b : (N,) array_like
+        Right-hand side n-vector in a x = b
+    u : (N,) array_like
+        Outer product uv.T of two nonzero n-vectors u
+    v : (N,) array_like
+        Outer product uv.T of two nonzero n-vectors v
+    y : (N,) array_like, default: None
+        Solution of Ay = b. If provided, save a O(n^2) trangular matrix solving for y.
+
+    References
+    ----------
+    .. [1] Heath, Michael T., 2018. Scientific Computing, Revised Second Edition
+    , Society for Industrial and Applied Mathematics.
+
+    Examples
+    --------
+    Solve the linear system a x = b, where:
+
+             [1  2  2]       [ 3]
+        a =  [4  4  2]   b = [ 6]
+             [4  4  4]       [10]
+
+    Which is a rank-one modification of the system
+
+             [1  2  2]       [ 3]
+        a =  [4  4  2]   b = [ 6]
+             [4  6  4]       [10]
+
+    as only the (3, 2) entry of the matrix a has changed,
+    from 6 to 4. One way to choose the update vectors is
+
+             [0]       [0]
+        u =  [0]   v = [2]
+             [1]       [0]
+
+    so that the matrix of the modified system is A - uv.T
+             [1  2  2]
+        a =  [4  4  2]
+             [4  4  4]
+
+    A simple application of solve is:
+
+    >>> a = np.array([[1., 2., 2.],
+    ...               [4., 4., 2.],
+    ...               [4., 6., 4.]], dtype=float)
+    >>> b = np.array([3, 6, 10], dtype=float)
+
+    If y is known
+
+    >>> y = np.array([-1.,  3., -1.])
+    >>> u = np.array([0., 0., 1.])
+    >>> v = np.array([0., 2., 0.])
+    >>> lu_factorization(a)
+    >>> rank_one_updating(a, b, u, v, y)
+    array([ 2. , -1.5,  2. ])
+
+    If y not known
+
+    >>> rank_one_updating(a, b, u, v)
+    array([ 2. , -1.5,  2. ])
+
+    """
+    solve(a, u, lu_factorized=True)  # Solve Az = u for z, so that z = A^-1 u
+
+    if y is None:
+        solve(a, b, lu_factorized=True)  # Solve Ay = b for y, so that y = A^-1 b
+        x = b + (np.dot(v, b) / (1 - np.dot(v, u))) * u  # x = y + ((v.Ty)/(1 - v.Tz)) z
+    else:
+        x = y + (np.dot(v, y) / (1 - np.dot(v, u))) * u
+
+    return x

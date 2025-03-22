@@ -23,6 +23,7 @@ from memory_profiler import profile
 # TODO 1: warning after num_iter has been reached, not yet converge
 # TODO 2: abstract stopping criterian
 # TODO 3: pretty print/verbose
+# TODO 4: Parallel algorithms
 
 
 def timefn(fn):
